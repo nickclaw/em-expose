@@ -107,6 +107,25 @@ function buildRouter(model, options) {
             });
 
     return router;
+
+
+    /**
+     * Reusable middleware to convert the :id param to an object
+     * @param {Boolean} lean
+     * @return {Function} middleware
+     */
+    function intercept(lean) {
+        return function(req, res, next) {
+            model.findById(req.params.id, select)
+                .lean(lean)
+                .exec(function(err, doc) {
+                    if (err) return next(err);
+                    if (!doc) return next(new Error('uhoh'));
+                    req._doc = doc;
+                    next();
+                });
+        }
+    }
 }
 
 /**
@@ -117,21 +136,3 @@ function noop(){
     var next = arguments[arguments.length - 1];
     return typeof next === 'function' ? next() : true;
 };
-
-/**
- * Reusable middleware to convert the :id param to an object
- * @param {Boolean} lean
- * @return {Function} middleware
- */
-function intercept(lean) {
-    return function() {
-        model.findById(req.params.id, select)
-            .lean(lean)
-            .exec(function(err, doc) {
-                if (err) return next(err);
-                if (!doc) return next(new Error('uhoh'));
-                req._doc = doc;
-                next();
-            });
-    }
-}
