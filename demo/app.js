@@ -7,14 +7,23 @@ var express = require('express'),
 
 // create some models
 var itemSchema = mongoose.Schema({
-
+    text: {type: String, required: true},
+    protectedText: {type: String, default: "You can't touch this!"},
+    privateText: {type: String, default: "You can't see this..."}
 });
 var Item = mongoose.model('Item', itemSchema);
 
 
 // expose models
 expose.expose(Item, {
+    protected: ['protectedText'],
+    private: ['privateText', '__v']
+});
 
+expose.expose(Item, {
+    path: '/admin/item',
+    protected: ['protectedText'],
+    private: ['__v']
 });
 
 
