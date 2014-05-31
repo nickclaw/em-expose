@@ -3,7 +3,7 @@ var flat = require('flat'),
     express = require('express');
 
 module.exports = {
-    _router = express.Router();
+    _router: express.Router(),
 
     /**
      * Expose a mongoose model
@@ -15,7 +15,7 @@ module.exports = {
      * @param {Function?} options.validate    validate data before applying to doc
      */
     expose: function(model, options) {
-        options.path = options.path || model.modelName.toLowerCase();
+        options.path = options.path || '/' + model.modelName.toLowerCase();
 
         options.caseSensitive = options.caseSensitive || false;
         options.strict = options.strict || false;
