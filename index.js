@@ -86,7 +86,7 @@ function buildRouter(model, options) {
              * Intercept just JSON because that's all we need
              */
             .get(intercept(true), function(req, res, next) {
-                return omit(req._doc);
+                res.send(omit(req._doc));
             })
 
             /**
@@ -145,11 +145,11 @@ function buildRouter(model, options) {
     /**
      * Remove all private paths we don't want to include
      * when we send this object across the interwebs
-     * @param {Model} model
+     * @param {Model} doc
      * @return {Object}
      */
-    function omit(model) {
-        return deepOmit(model.toJSON(), options.private);
+    function omit(doc) {
+        return deepOmit(doc.toObject ? doc.toObject() : doc, options.private);
     }
 }
 
@@ -183,11 +183,11 @@ function deepOmit(obj, paths) {
             keys = Object.keys(object);
 
         // iterate over object key/values
-        for (var i = 0, key = null, val = null; val = object[key = keys[i]]; i++) {
-            if (paths.indexOf(past + (past?'.':'') + key) !== 0) {
+        for (var i = 0, key = null, val = null; (val = object[key = keys[i]]) !== undefined; i++) {
+            if (paths.indexOf(past + (past?'.':'') + key) == -1) {
                 copy[key] = val;
 
-                if (typeof val === 'object') {
+                if (typeof val === 'object' && key !== '_id') {
                     copy[key] = step(past + (past?'.':'') + key, val);
                 }
             }
