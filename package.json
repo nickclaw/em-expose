@@ -13,5 +13,6 @@
     "url": "nickclaw.com"
   },
   "dependencies": {
+    "flat": "~1.2.1"
   }
 }
