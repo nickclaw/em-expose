@@ -12,6 +12,7 @@ module.exports = {
      * @param {String?} options.path    subpath this module is exposed under
      * @param {Array|Object?} options.private    paths that aren't exposed
      * @param {Array|Object?} options.protected    paths that aren't editable
+     * @param {Function?} options.validate    validate data before applying to doc
      */
     expose: function(model, options) {
         options.path = options.path || model.modelName.toLowerCase();
@@ -20,6 +21,7 @@ module.exports = {
         options.strict = options.strict || false;
         options.private = options.private || [];
         options.protected = options.protected || [];
+        options.validate = options.validate || noop;
 
         this._router.use(options.path, buildRouter(model, options));
     },
@@ -49,6 +51,13 @@ function buildRouter(model, options) {
     router
 
         /**
+         * Search for documents
+         */
+        .get('/', function(req, res, next) {
+
+        })
+
+        /**
          * Create a document
          */
         .post('/', function(req, res, next) {
@@ -57,23 +66,30 @@ function buildRouter(model, options) {
         .route('/:id')
 
             /**
+             * Intercept the call and find the document
+             */
+            .all(function(req, res, next) {
+                model.findById(req.params.id, select, function(err, doc) {
+                    if (err) return next(err);
+                    if (!doc) return next(new Error('uhoh'));
+                    req._doc = doc;
+                    next();
+                });
+            })
+
+            /**
              * Retrieve a document
              */
             .get(function(req, res, next) {
-                model.findById(req.params.id, select, function(err, doc) {
-                    if (err) return next(err);
-                    if (!doc) return next(new Error('uhoh get'));
-                    res.send(doc);
-                });
+                return req._doc.toObject();
             })
 
             /**
              * Update a document
              */
             .put(function(req, res, next) {
-                model.findByIdAndUpdate(req.params.id, {}, {select: select}, function(err, doc) {
+                req._doc.update(req.body, function(err, doc) {
                     if (err) return next(err);
-                    if (!doc) return next(new Error('uhoh update'));
                     res.send(doc);
                 });
             })
@@ -82,12 +98,20 @@ function buildRouter(model, options) {
              * Delete a document
              */
             .delete(function(req, res, next) {
-                model.findByIdAndRemove(req.params.id, function(err, doc) {
+                req._doc.remove(function(err, doc) {
                     if (err) return next(err);
-                    if (!doc) return next(new Error('uhoh delete'));
                     res.send(doc);
                 });
             });
 
     return router;
 }
+
+/**
+ * Noooooooope...
+ * with support for async Nooooooooope...
+ */
+function noop(){
+    var next = arguments[arguments.length - 1];
+    return typeof next === 'function' ? next() : true;
+};
