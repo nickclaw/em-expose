@@ -43,10 +43,9 @@ module.exports = {
  */
 function buildRouter(model, options) {
     var router = express.Router({
-            strict: options.strict,
-            caseSensitive: options.caseSensitive
-        }),
-        select = options.private ? '-' + options.private.join(' -') : '';
+        strict: options.strict,
+        caseSensitive: options.caseSensitive
+    });
 
     router
 
@@ -61,12 +60,13 @@ function buildRouter(model, options) {
                 .limit(req.query.limit || 15)
                 .skip(req.query.offset || 0)
                 .sort(sort)
-                .select(select)
                 .lean()
                 .exec(function(err, docs) {
                     if (err) return next(err);
                     if (!docs) return next(new Error('uhoh browse'));
-                    res.send(docs);
+                    res.send(docs.map(function(doc) {
+                        return omit(doc);
+                    }));
                 });
         })
 
@@ -74,24 +74,29 @@ function buildRouter(model, options) {
          * Create a document
          */
         .post('/', function(req, res, next) {
-
+            model.create(protect(req.body), function(err, doc) {
+                if (err) return next(err);
+                res.send(omit(doc));
+            });
         })
         .route('/:id')
 
             /**
              * Retrieve a document
+             * Intercept just JSON because that's all we need
              */
             .get(intercept(true), function(req, res, next) {
-                return req._doc.toObject();
+                return omit(req._doc);
             })
 
             /**
              * Update a document
+             * Intercept model because we need to apply validation and update it
              */
             .put(intercept(false), function(req, res, next) {
-                req._doc.update(req.body, function(err, doc) {
+                req._doc.update(protect(req.body), function(err, doc) {
                     if (err) return next(err);
-                    res.send(doc);
+                    res.send(omit(doc));
                 });
             })
 
@@ -99,10 +104,10 @@ function buildRouter(model, options) {
              * Delete a document
              */
             .delete(function(req, res, next) {
-                model.findByIdAndRemove(req.params.body, function(err, doc) {
+                model.findByIdAndRemove(req.params.id, function(err, doc) {
                     if (err) return next(err);
                     if (!doc) return next(new Error('uhoh'));
-                    res.send(doc);
+                    res.send(omit(doc));
                 });
             });
 
@@ -116,7 +121,7 @@ function buildRouter(model, options) {
      */
     function intercept(lean) {
         return function(req, res, next) {
-            model.findById(req.params.id, select)
+            model.findById(req.params.id)
                 .lean(lean)
                 .exec(function(err, doc) {
                     if (err) return next(err);
@@ -125,6 +130,26 @@ function buildRouter(model, options) {
                     next();
                 });
         }
+    }
+
+    /**
+     * Remove all protected paths from an object
+     * before we try to create/update an actual model
+     * @param {Object} object
+     * @return {Object}
+     */
+    function protect(object) {
+        return deepOmit(object, options.protected);
+    }
+
+    /**
+     * Remove all private paths we don't want to include
+     * when we send this object across the interwebs
+     * @param {Model} model
+     * @return {Object}
+     */
+    function omit(model) {
+        return deepOmit(model.toJSON(), options.private);
     }
 }
 
@@ -136,3 +161,40 @@ function noop(){
     var next = arguments[arguments.length - 1];
     return typeof next === 'function' ? next() : true;
 };
+
+
+/**
+ * Omit paths from an object
+ * based off of https://gist.github.com/dtsn/7098527
+ * @param {Object} obj
+ * @param {Array.<String>} paths
+ * @return {Object}
+ */
+function deepOmit(obj, paths) {
+
+    /**
+     * Recursive function to navigate deep object
+     * @param {String} past
+     * @param {Object} object
+     * @return {Object}
+     */
+    function step(past, object) {
+        var copy = {},
+            keys = Object.keys(object);
+
+        // iterate over object key/values
+        for (var i = 0, key = null, val = null; val = object[key = keys[i]]; i++) {
+            if (paths.indexOf(past + (past?'.':'') + key) !== 0) {
+                copy[key] = val;
+
+                if (typeof val === 'object') {
+                    copy[key] = step(past + (past?'.':'') + key, val);
+                }
+            }
+        }
+
+        return copy;
+    }
+
+    return step('', obj);
+}
