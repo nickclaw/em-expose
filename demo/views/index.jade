@@ -1,0 +1,15 @@
+doctype html
+html
+    head
+        link(href="/static/style.css" type="text/css" rel="stylesheet")
+
+    body(ng-app="app")
+        div(id="container" ng-controller="Controller")
+            textarea(ng-model="new.text")
+            button(ng-click="submit()") submit
+
+            item(ng-repeat="item in items" item="item")
+
+        script(src="https://code.angularjs.org/1.2.9/angular.min.js")
+        script(src="https://code.angularjs.org/1.2.9/angular-resource.min.js")
+        script(src="/static/script.js")
