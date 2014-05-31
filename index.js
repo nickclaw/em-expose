@@ -40,4 +40,54 @@ module.exports = {
  * @param {Object?} options same as expose function
  */
 function buildRouter(model, options) {
+    var router = express.Router({
+            strict: options.strict,
+            caseSensitive: options.caseSensitive
+        }),
+        select = options.private.join(' -');
+
+    router
+
+        /**
+         * Create a document
+         */
+        .post('/', function(req, res, next) {
+
+        })
+        .route('/:id')
+
+            /**
+             * Retrieve a document
+             */
+            .get(function(req, res, next) {
+                model.findById(req.params.id, select, function(err, doc) {
+                    if (err) return next(err);
+                    if (!doc) return next(new Error('uhoh get'));
+                    res.send(doc);
+                });
+            })
+
+            /**
+             * Update a document
+             */
+            .put(function(req, res, next) {
+                model.findByIdAndUpdate(req.params.id, {}, {select: select}, function(err, doc) {
+                    if (err) return next(err);
+                    if (!doc) return next(new Error('uhoh update'));
+                    res.send(doc);
+                });
+            })
+
+            /**
+             * Delete a document
+             */
+            .delete(function(req, res, next) {
+                model.findByIdAndRemove(req.params.id, function(err, doc) {
+                    if (err) return next(err);
+                    if (!doc) return next(new Error('uhoh delete'));
+                    res.send(doc);
+                });
+            });
+
+    return router;
 }
