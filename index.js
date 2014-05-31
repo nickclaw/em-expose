@@ -1,47 +1,77 @@
-var flat = require('flat'),
-    mongoose = require('mongoose'),
-    express = require('express');
+var mongoose = require('mongoose'),
+    express = require('express'),
+    _ = require('underscore'),
+    util = require('./lib/util.js');
 
-module.exports = {
-    _router: express.Router(),
-
-    /**
-     * Expose a mongoose model
-     * @param {Model} model
-     * @param {Object?} options
-     * @param {String?} options.path    subpath this module is exposed under
-     * @param {Array|Object?} options.private    paths that aren't exposed
-     * @param {Array|Object?} options.protected    paths that aren't editable
-     * @param {Function?} options.validate    validate data before applying to doc
-     */
-    expose: function(model, options) {
-        options.path = options.path || '/' + model.modelName.toLowerCase();
-
-        options.caseSensitive = options.caseSensitive || false;
-        options.strict = options.strict || false;
-        options.private = options.private || [];
-        options.protected = options.protected || [];
-        options.validate = options.validate || noop;
-
-        this._router.use(options.path, buildRouter(model, options));
-    },
-
-
-    /**
-     * Allow em-expose to be used by express `app.use()`
-     * @return {Router} express middleware
-     */
-    middleware: function() {
-        return this._router;
-    }
+function Exposer(options) {
+    this.setOptions(options);
+    this.router = express.Router();
 }
 
 /**
- * Builds a CRUD router for a model
+ * Sets the options
+ * We include this because we create an Exposer object
+ * on `require`, meaning the user doesn't have an opportunity
+ * to create an Exposer with their own options.
+ * Now they can do it after the fact!
+ *
+ * @param {Object} options
+ * @return {Exposer} this
+ */
+Exposer.prototype.setOptions = function(options) {
+    this.options = _.defaults(_.clone(options || {}), {
+        caseSensitive: false,
+        strict: false
+    });
+}
+
+/**
+ * Expose a mongoose model
+ * @param {Model} model
+ * @param {Object?} options
+ * @param {String?} options.path    subpath this module is exposed under
+ * @param {Array|Object?} options.private    paths that aren't exposed
+ * @param {Array|Object?} options.protected    paths that aren't editable
+ * @param {Function?} options.validate    validate data before applying to doc
+ * @return {Exposer} this
+ */
+Exposer.prototype.expose = function(Model, options) {
+    options = _.defaults(_.clone(options), {
+        path: '/' + Model.modelName.toLowerCase(),
+        caseSensitive: this.caseSensitive,
+        strict: this.strict,
+
+        private: [],
+        protected: [],
+        validate: util.noop
+    });
+    this.router.use(options.path, buildRouter(Model, options));
+
+    return this;
+}
+
+/**
+ * Returns a Router object for use with Express app.use()
+ * @return {Router}
+ */
+Exposer.prototype.middleware = function() {
+    return this.router;
+}
+
+module.exports = new Exposer();
+module.exports.Exposer = Exposer; // so we can make more than one
+
+
+/**
+ * Builds a CRUD router for a Model. The heart of the beast...
+ * Also contains some closures at the bottom, if you're wondering
+ * where some of these functions are coming from...
+ *
  * @param {Model} model
  * @param {Object?} options same as expose function
+ * @return {Router}
  */
-function buildRouter(model, options) {
+function buildRouter(Model, options) {
     var router = express.Router({
         strict: options.strict,
         caseSensitive: options.caseSensitive
@@ -56,7 +86,7 @@ function buildRouter(model, options) {
             var sort = {};
             sort[req.query.sort || '_id'] = req.query.order || 'asc';
 
-            model.find()
+            Model.find()
                 .limit(req.query.limit || 15)
                 .skip(req.query.offset || 0)
                 .sort(sort)
@@ -74,7 +104,7 @@ function buildRouter(model, options) {
          * Create a document
          */
         .post('/', function(req, res, next) {
-            model.create(protect(req.body), function(err, doc) {
+            Model.create(protect(req.body), function(err, doc) {
                 if (err) return next(err);
                 res.send(omit(doc));
             });
@@ -91,7 +121,7 @@ function buildRouter(model, options) {
 
             /**
              * Update a document
-             * Intercept model because we need to apply validation and update it
+             * Intercept Model because we need to apply validation and update it
              */
             .put(intercept(false), function(req, res, next) {
                 req._doc.update(protect(req.body), function(err, doc) {
@@ -104,7 +134,7 @@ function buildRouter(model, options) {
              * Delete a document
              */
             .delete(function(req, res, next) {
-                model.findByIdAndRemove(req.params.id, function(err, doc) {
+                Model.findByIdAndRemove(req.params.id, function(err, doc) {
                     if (err) return next(err);
                     if (!doc) return next(new Error('uhoh'));
                     res.send(omit(doc));
@@ -114,6 +144,11 @@ function buildRouter(model, options) {
     return router;
 
 
+    /* These closures 'like' having access to some of their
+     * parent functions variables like 'Model', and 'options'
+     * I could move them elsewhere but, meh..
+     */
+
     /**
      * Reusable middleware to convert the :id param to an object
      * @param {Boolean} lean
@@ -121,7 +156,7 @@ function buildRouter(model, options) {
      */
     function intercept(lean) {
         return function(req, res, next) {
-            model.findById(req.params.id)
+            Model.findById(req.params.id)
                 .lean(lean)
                 .exec(function(err, doc) {
                     if (err) return next(err);
@@ -134,12 +169,12 @@ function buildRouter(model, options) {
 
     /**
      * Remove all protected paths from an object
-     * before we try to create/update an actual model
+     * before we try to create/update an actual Model
      * @param {Object} object
      * @return {Object}
      */
     function protect(object) {
-        return deepOmit(object, options.protected);
+        return util.deepOmit(object, options.protected);
     }
 
     /**
@@ -149,52 +184,6 @@ function buildRouter(model, options) {
      * @return {Object}
      */
     function omit(doc) {
-        return deepOmit(doc.toObject ? doc.toObject() : doc, options.private);
+        return util.deepOmit(doc.toObject ? doc.toObject() : doc, options.private);
     }
-}
-
-/**
- * Noooooooope...
- * with support for async Nooooooooope...
- */
-function noop(){
-    var next = arguments[arguments.length - 1];
-    return typeof next === 'function' ? next() : true;
-};
-
-
-/**
- * Omit paths from an object
- * based off of https://gist.github.com/dtsn/7098527
- * @param {Object} obj
- * @param {Array.<String>} paths
- * @return {Object}
- */
-function deepOmit(obj, paths) {
-
-    /**
-     * Recursive function to navigate deep object
-     * @param {String} past
-     * @param {Object} object
-     * @return {Object}
-     */
-    function step(past, object) {
-        var copy = {},
-            keys = Object.keys(object);
-
-        // iterate over object key/values
-        for (var i = 0, key = null, val = null; (val = object[key = keys[i]]) !== undefined; i++) {
-            if (paths.indexOf(past + (past?'.':'') + key) == -1) {
-                copy[key] = val;
-
-                if (typeof val === 'object' && key !== '_id') {
-                    copy[key] = step(past + (past?'.':'') + key, val);
-                }
-            }
-        }
-
-        return copy;
-    }
-
-    return step('', obj);
 }

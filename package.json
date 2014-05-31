@@ -17,7 +17,7 @@
     "demo": "node ./demo/app.js"
   },
   "dependencies": {
-    "flat": "~1.2.1"
+    "underscore": "~1.6.0"
   },
   "devDependencies": {
     "express": "~4.4.0",
