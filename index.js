@@ -51,10 +51,23 @@ function buildRouter(model, options) {
     router
 
         /**
-         * Search for documents
+         * Browse for documents
          */
         .get('/', function(req, res, next) {
+            var sort = {};
+            sort[req.query.sort || '_id'] = req.query.order || 'asc';
 
+            model.find()
+                .limit(req.query.limit || 15)
+                .skip(req.query.offset || 0)
+                .sort(sort)
+                .select(select)
+                .lean()
+                .exec(function(err, docs) {
+                    if (err) return next(err);
+                    if (!docs) return next(new Error('uhoh browse'));
+                    res.send(docs);
+                });
         })
 
         /**
