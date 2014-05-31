@@ -46,7 +46,7 @@ function buildRouter(model, options) {
             strict: options.strict,
             caseSensitive: options.caseSensitive
         }),
-        select = options.private.join(' -');
+        select = options.private ? '-' + options.private.join(' -') : '';
 
     router
 
@@ -79,28 +79,16 @@ function buildRouter(model, options) {
         .route('/:id')
 
             /**
-             * Intercept the call and find the document
-             */
-            .all(function(req, res, next) {
-                model.findById(req.params.id, select, function(err, doc) {
-                    if (err) return next(err);
-                    if (!doc) return next(new Error('uhoh'));
-                    req._doc = doc;
-                    next();
-                });
-            })
-
-            /**
              * Retrieve a document
              */
-            .get(function(req, res, next) {
+            .get(intercept(true), function(req, res, next) {
                 return req._doc.toObject();
             })
 
             /**
              * Update a document
              */
-            .put(function(req, res, next) {
+            .put(intercept(false), function(req, res, next) {
                 req._doc.update(req.body, function(err, doc) {
                     if (err) return next(err);
                     res.send(doc);
@@ -111,8 +99,9 @@ function buildRouter(model, options) {
              * Delete a document
              */
             .delete(function(req, res, next) {
-                req._doc.remove(function(err, doc) {
+                model.findByIdAndRemove(req.params.body, function(err, doc) {
                     if (err) return next(err);
+                    if (!doc) return next(new Error('uhoh'));
                     res.send(doc);
                 });
             });
@@ -128,3 +117,21 @@ function noop(){
     var next = arguments[arguments.length - 1];
     return typeof next === 'function' ? next() : true;
 };
+
+/**
+ * Reusable middleware to convert the :id param to an object
+ * @param {Boolean} lean
+ * @return {Function} middleware
+ */
+function intercept(lean) {
+    return function() {
+        model.findById(req.params.id, select)
+            .lean(lean)
+            .exec(function(err, doc) {
+                if (err) return next(err);
+                if (!doc) return next(new Error('uhoh'));
+                req._doc = doc;
+                next();
+            });
+    }
+}
