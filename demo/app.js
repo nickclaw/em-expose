@@ -24,6 +24,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.use(bodyParser()); // required
 app.use('/api', expose.middleware()); // add middleware to /api route
+app.use('/static', express.static(path.join(__dirname, 'public')));
 app.use(function(req, res, next) {
     res.render('index');
 });
