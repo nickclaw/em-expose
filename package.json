@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "description": "Automatically expose an Express api for Mongoose documents.",
   "main": "index.js",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/nickclaw/em-express"
