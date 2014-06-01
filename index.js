@@ -1,7 +1,8 @@
 var mongoose = require('mongoose'),
     express = require('express'),
     _ = require('underscore'),
-    util = require('./lib/util.js');
+    util = require('./lib/util.js'),
+    validator = require('./lib/validator.js');
 
 function Exposer(options) {
     this.setOptions(options);
@@ -43,10 +44,27 @@ Exposer.prototype.expose = function(Model, options) {
 
         private: [],
         protected: [],
-        validate: util.noop
+        validate: {},
+        validator: null
     });
-    this.router.use(options.path, buildRouter(Model, options));
 
+    // if there isn't a supplied validator
+    // build one from the model and supplied validate
+    if (!options.validator) {
+        var parsedRules = validator.parseRules(Model);
+        _.map(options.validate, function(rules, path) {
+            if (!parsedRules[path]) return rules;
+            return parsedRules[path].concat(rules);
+        });
+        options.validator = validator.validator(options.validate);
+    }
+
+    Model.schema.pre('save', function(next) {
+        var errors = validator.validate(this);
+        next(errors ? validator.error("Validation error.", errors) : undefined);
+    });
+
+    this.router.use(options.path, buildRouter(Model, options));
     return this;
 }
 
@@ -104,7 +122,9 @@ function buildRouter(Model, options) {
          * Create a document
          */
         .post('/', function(req, res, next) {
-            Model.create(protect(req.body), function(err, doc) {
+            var model = new Model(protect(req.body));
+
+            model.save(function(err, doc) {
                 if (err) return next(err);
                 res.send(omit(doc));
             });
@@ -124,7 +144,8 @@ function buildRouter(Model, options) {
              * Intercept Model because we need to apply validation and update it
              */
             .put(intercept(false), function(req, res, next) {
-                req._doc.update(protect(req.body), function(err, doc) {
+                req._doc.set(protect(req.body));
+                req._doc.save(function(err, doc) {
                     if (err) return next(err);
                     res.send(omit(doc));
                 });
@@ -140,6 +161,13 @@ function buildRouter(Model, options) {
                     res.send(omit(doc));
                 });
             });
+
+    router.use(function(err, req, res, next) {
+        res.send({
+            message: err.message,
+            data: err.data
+        });
+    });
 
     return router;
 
