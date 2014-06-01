@@ -108,10 +108,9 @@ function buildRouter(Model, options) {
                 .limit(req.query.limit || 15)
                 .skip(req.query.offset || 0)
                 .sort(sort)
-                .lean()
+                .lean(true)
                 .exec(function(err, docs) {
                     if (err) return next(err);
-                    if (!docs) return next(new Error('uhoh browse'));
                     res.send(docs.map(function(doc) {
                         return omit(doc);
                     }));
@@ -157,11 +156,14 @@ function buildRouter(Model, options) {
             .delete(function(req, res, next) {
                 Model.findByIdAndRemove(req.params.id, function(err, doc) {
                     if (err) return next(err);
-                    if (!doc) return next(new Error('uhoh'));
+                    if (!doc) return next(new Error('Not found.'));
                     res.send(omit(doc));
                 });
             });
 
+    /**
+     * Catch all errors
+     */
     router.use(function(err, req, res, next) {
         res.send(404, {
             message: err.message,
@@ -188,7 +190,7 @@ function buildRouter(Model, options) {
                 .lean(lean)
                 .exec(function(err, doc) {
                     if (err) return next(err);
-                    if (!doc) return next(new Error('uhoh'));
+                    if (!doc) return next(new Error('Not found.'));
                     req._doc = doc;
                     next();
                 });
