@@ -17,15 +17,15 @@ var Item = mongoose.model('Item', itemSchema);
 // expose models
 expose.expose(Item, {
     protected: ['protectedText'],
-    private: ['privateText', '__v']
+    private: ['privateText', '__v'],
+    validate: {
+        'text': [{
+            rule: 'minLength',
+            args: [100],
+            error: 'Must be longer than {{1}} characters. It is currently {{0}}.'
+        }]
+    }
 });
-
-expose.expose(Item, {
-    path: '/admin/item',
-    protected: ['protectedText'],
-    private: ['__v']
-});
-
 
 // setup express
 var app = express();

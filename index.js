@@ -60,7 +60,7 @@ Exposer.prototype.expose = function(Model, options) {
     }
 
     Model.schema.pre('save', function(next) {
-        var errors = validator.validate(this);
+        var errors = options.validator(this);
         next(errors ? validator.error("Validation error.", errors) : undefined);
     });
 
@@ -163,7 +163,7 @@ function buildRouter(Model, options) {
             });
 
     router.use(function(err, req, res, next) {
-        res.send({
+        res.send(404, {
             message: err.message,
             data: err.data
         });
