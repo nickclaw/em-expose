@@ -17,7 +17,8 @@
     "demo": "node ./demo/app.js"
   },
   "dependencies": {
-    "underscore": "~1.6.0"
+    "underscore": "~1.6.0",
+    "iz": "git://github.com/nickclaw/iz.git#qdb"
   },
   "devDependencies": {
     "express": "~4.4.0",
