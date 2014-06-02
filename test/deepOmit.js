@@ -1,4 +1,4 @@
-var util = require('../lib/util.js'),
+var deepOmit = require('../lib/util.js').deepOmit,
     expect = require('chai').expect;
 
 describe('deepOmit', function() {
@@ -11,7 +11,7 @@ describe('deepOmit', function() {
             five: true
         };
 
-        var ommited = util.deepOmit(obj, ['one', 'three', 'five']);
+        var ommited = deepOmit(obj, ['one', 'three', 'five']);
 
         expect(ommited).to.deep.equal({
             two: true,
@@ -25,7 +25,7 @@ describe('deepOmit', function() {
             two: true
         }
 
-        var ommited = util.deepOmit(obj, ['one.nothing', 'two']);
+        var ommited = deepOmit(obj, ['one.nothing', 'two']);
         expect(ommited).to.deep.equal({
             one: true
         });
@@ -43,7 +43,7 @@ describe('deepOmit', function() {
             }
         };
 
-        var ommited = util.deepOmit(obj, ['one.two', 'two']);
+        var ommited = deepOmit(obj, ['one.two', 'two']);
 
         expect(ommited).to.deep.equal({
             one: {
@@ -62,7 +62,7 @@ describe('deepOmit', function() {
             }
         }
 
-        expect(util.deepOmit(obj, ['three'])).to.deep.equal(obj);
+        expect(deepOmit(obj, ['three'])).to.deep.equal(obj);
     });
 
     it('should handle array subobjects', function() {
@@ -81,7 +81,7 @@ describe('deepOmit', function() {
             }
         };
 
-        var omitted = util.deepOmit(obj, ['one.two', 'two.one', 'two.two.one']);
+        var omitted = deepOmit(obj, ['one.two', 'two.one', 'two.two.one']);
 
         expect(omitted).to.deep.equal({
             one: [
@@ -106,7 +106,7 @@ describe('deepOmit', function() {
             two: true
         }];
 
-        var ommited = util.deepOmit(obj, ['one.one', 'two']);
+        var ommited = deepOmit(obj, ['one.one', 'two']);
 
         expect(ommited).to.deep.equal([{
             one: [{two: true}]
