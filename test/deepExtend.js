@@ -52,7 +52,7 @@ describe('deepDefault', function() {
                 },
             }
         };
-        
+
         expect(deepExtend(defaults, obj)).to.deep.equal({
             one: {
                 one: {
@@ -69,6 +69,127 @@ describe('deepDefault', function() {
                     one: true,
                     two: true,
                     three: true
+                }
+            }
+        });
+    });
+
+    it('should work with functions', function() {
+        function a(){};
+        expect(a).to.equal(a);
+        var options = {
+            private: ['__v', 'upvotes', 'downvotes'],
+            protected: ['_id', 'owner', 'authors', 'root'],
+
+            custom: {
+                update: {
+                    pre: a,
+                    post: "HII"
+                },
+                delete: {
+                    pre: a
+                },
+                create: {
+                    pre: a
+                }
+            }
+        }
+
+        expect(deepExtend({
+            // sub path to expose under
+            path: '/path',
+            // subroutes to expose
+            methods: ['create', 'retrieve', 'update', 'delete', 'browse'],
+
+            // passed to express.Router()
+            caseSensitive: this.caseSensitive,
+            strict: this.strict,
+
+            // global settings
+            private: [],    // not exposed
+            protected: [],  // not editable/setable
+            pre: null, // passed in req.body & next
+            post: null,// passed in document & next
+
+            custom: {
+                create: {
+                    private: [],
+                    protected: [],
+                    pre: null,
+                    post: null
+                },
+                retrieve: {
+                    private: [],
+                    protected: [],
+                    pre: null,
+                    post: null
+                },
+                update: {
+                    private: [],
+                    protected: [],
+                    pre: null,
+                    post: null
+                },
+                delete: {
+                    private: [],
+                    protected: [],
+                    pre: null,
+                    post: null
+                },
+                browse: {
+                    private: [],
+                    protected: [],
+                    pre: null,
+                    post: null
+                }
+            }
+        }, options)).to.deep.equal({
+
+            // sub path to expose under
+            path: '/path',
+            // subroutes to expose
+            methods: ['create', 'retrieve', 'update', 'delete', 'browse'],
+
+            // passed to express.Router()
+            caseSensitive: this.caseSensitive,
+            strict: this.strict,
+
+            // global settings
+            private: ['__v', 'upvotes', 'downvotes'],
+            protected: ['_id', 'owner', 'authors', 'root'],
+            pre: null, // passed in req.body & next
+            post: null,// passed in document & next
+
+            custom: {
+                create: {
+                    private: [],
+                    protected: [],
+                    pre: a,
+                    post: null
+                },
+                retrieve: {
+                    private: [],
+                    protected: [],
+                    pre: null,
+                    post: null
+                },
+                update: {
+                    private: [],
+                    protected: [],
+                    pre: a,
+                    post: "HII"
+                },
+                delete: {
+                    private: [],
+                    protected: [],
+                    pre: a,
+                    post: null
+                },
+                browse: {
+                    private: [],
+                    protected: [],
+                    pre: null,
+                    post: null
                 }
             }
         });
