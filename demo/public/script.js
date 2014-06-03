@@ -7,7 +7,7 @@ angular.module('app', ['ngResource'])
             $scope.new = new Item();
             $scope.submit = function() {
                 $scope.new.$create({}, function() {
-                    $scope.items.unshift($scope.new);
+                    $scope.items.push($scope.new);
                     $scope.new = new Item();
                 });
             }
