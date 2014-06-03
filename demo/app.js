@@ -18,13 +18,6 @@ var Item = mongoose.model('Item', itemSchema);
 expose.expose(Item, {
     protected: ['protectedText'],
     private: ['privateText', '__v'],
-    validate: {
-        'text': [{
-            rule: 'minLength',
-            args: [100],
-            error: 'Must be longer than {{1}} characters. It is currently {{0}}.'
-        }]
-    }
 });
 
 // setup express
