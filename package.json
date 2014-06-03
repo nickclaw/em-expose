@@ -18,8 +18,7 @@
     "test": "./node_modules/mocha/bin/mocha ./test/"
   },
   "dependencies": {
-    "underscore": "~1.6.0",
-    "iz": "git://github.com/nickclaw/iz.git#qdb"
+    "underscore": "~1.6.0"
   },
   "devDependencies": {
     "express": "~4.4.0",

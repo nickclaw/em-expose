@@ -74,6 +74,7 @@ Builds an Express router that exposes the Mongoose model.
         * `browse`, `create`, `retrieve`, `update`, and/or `delete`
             * `private` - Override the Array of paths that are not shown or editable.
             * `protected` - Override the Array of paths that are shown but not editable. (only matters on `create` and `update`)
+            * `pre` - `function(req, res, nex)` - Express style middleware function, called before anything else.
 
 #### Example
 ```javascript
