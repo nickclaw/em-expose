@@ -1,5 +1,5 @@
 <div class="item">
-    <textarea>{{item.text}}</textarea>
+    <textarea ng-model="item.text"></textarea>
     <button ng-click="item.$save()">save</button>
     <button ng-click="remove(item)">delete</button>
 </div>
