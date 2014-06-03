@@ -37,8 +37,8 @@ app.use('/api', em.middleware());
 # Documentation
 
 ## Exposer
-When you require `em-expose`, you are returned an object of the Exposer class.
-If you want to create multiple Exposer objects or deviate from the custom
+
+#### NOTE: `require('em-expose')` already returns an Exposer object. You will rarely need to create one yourself
 
 ### constructor(options)
 Create an Exposer object.
@@ -66,8 +66,8 @@ Builds an Express router that exposes the Mongoose model.
 * `options`
     * `path` - What subpath should the model be exposed under. Defaults to `'/' + Model.modelName.toLowerCase()`
     * `methods` - An Array of methods to expose. Defaults to `['browse', 'create', 'retrieve', 'update', 'delete']
-    * `caseSensitive`- Passed to the router. Defaults to `false`.
-    * `strict` - Passed to the router. Defaults to `false`.
+    * `caseSensitive`- Passed to the router. Defaults to Exposer settings (usually false).
+    * `strict` - Passed to the router. Defaults to Exposer settings (usually false).
     * `private` - Default Array of paths that are not shown or editable.
     * `protected` - Default Array of paths that are shown but not editable.
     * `custom` - Object to override individual method settings
