@@ -18,7 +18,7 @@
     "test": "./node_modules/mocha/bin/mocha ./test/"
   },
   "dependencies": {
-    "underscore": "~1.6.0"
+    "lodash": "^2.4.1"
   },
   "devDependencies": {
     "express": "~4.4.0",
