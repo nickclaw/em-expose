@@ -1,5 +1,5 @@
 // this is probably/definitely not necessary...
-var noop = require('../lib/util.js').noop,
+var noop = require('../../lib/util.js').noop,
     expect = require('chai').expect;
 
 describe('noop', function() {

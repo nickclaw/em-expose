@@ -1,5 +1,5 @@
 var expect = require('chai').expect,
-    get = require('../lib/util.js').get;
+    get = require('../../lib/util.js').get;
 
 describe('util#get', function() {
 

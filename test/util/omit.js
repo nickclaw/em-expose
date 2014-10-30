@@ -1,5 +1,5 @@
 var expect = require('chai').expect,
-    omit = require('../lib/util.js').omit;
+    omit = require('../../lib/util.js').omit;
 
 describe('util#omit', function() {
 

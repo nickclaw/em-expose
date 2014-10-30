@@ -1,5 +1,5 @@
 var expect = require('chai').expect,
-    whitelist = require('../lib/util.js').whitelist;
+    whitelist = require('../../lib/util.js').whitelist;
 
 describe('util#whitelist', function() {
 

@@ -1,5 +1,5 @@
 var expect = require('chai').expect,
-    remove = require('../lib/util.js').remove;
+    remove = require('../../lib/util.js').remove;
 
 describe('util#remove', function() {
 

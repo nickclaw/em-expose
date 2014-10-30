@@ -1,5 +1,5 @@
 var expect = require('chai').expect,
-    set = require('../lib/util.js').set;
+    set = require('../../lib/util.js').set;
 
 describe('util#set', function() {
 
