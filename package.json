@@ -1,12 +1,12 @@
 {
   "name": "em-expose",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Automatically expose an Express api for Mongoose documents.",
   "main": "index.js",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/nickclaw/em-express"
+    "url": "https://github.com/nickclaw/em-expose"
   },
   "author": {
     "name": "Nicholas Clawson",
