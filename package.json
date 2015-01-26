@@ -1,6 +1,6 @@
 {
   "name": "em-expose",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Automatically expose an Express api for Mongoose documents.",
   "main": "index.js",
   "license": "MIT",
@@ -15,7 +15,7 @@
   },
   "scripts": {
     "demo": "node ./demo/app.js",
-    "test": "./node_modules/mocha/bin/mocha ./test/"
+    "test": "./node_modules/mocha/bin/mocha ./test/** -R spec"
   },
   "dependencies": {
     "lodash": "^2.4.1"
