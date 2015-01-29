@@ -15,7 +15,7 @@
   },
   "scripts": {
     "demo": "node ./demo/app.js",
-    "test": "./node_modules/mocha/bin/mocha ./test/** -R spec"
+    "test": "./node_modules/mocha/bin/mocha test --recursive -R spec"
   },
   "dependencies": {
     "lodash": "^2.4.1"

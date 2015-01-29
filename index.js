@@ -1,6 +1,5 @@
 var util = require('./lib/util.js'),
-    Exposer = require('./lib/exposer.js');
+    expose = require('./lib/expose.js');
 
-module.exports = new Exposer({});
-module.exports.Exposer = Exposer; // so we can make more than one
+module.exports = expose;
 module.exports.util = util;

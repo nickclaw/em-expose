@@ -14,19 +14,42 @@ var itemSchema = mongoose.Schema({
 var Item = mongoose.model('Item', itemSchema);
 
 
-// expose models
-expose.expose(Item, {
-    protected: ['protectedText'],
-    private: ['privateText', '__v'],
-});
 
 // setup express
 var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.use(bodyParser()); // required
-app.use('/api', expose.middleware()); // add middleware to /api route
 app.use('/static', express.static(path.join(__dirname, 'public')));
+
+// expose item to /api/item path
+app.use('/api/item', expose(Item, {
+    protected: ['protectedText'],
+    private: ['privateText', '__v'],
+
+    methods: {
+        create: {
+
+        },
+
+        retrieve: {
+
+        },
+
+        update: {
+
+        },
+
+        remove: {
+
+        },
+
+        browse: {
+
+        }
+    }
+}));
+
 app.use(function(req, res, next) {
     res.render('index');
 });
