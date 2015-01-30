@@ -1,8 +1,4 @@
-var express = require('express'),
-    mongoose = require('mongoose'),
-    Model = require('../resources/model');
-
-console.log(global.app);
+var Model = require('../resources/model');
 
 describe('the retrieve route', function() {
 
@@ -27,7 +23,7 @@ describe('the retrieve route', function() {
             methods: {
                 create: null,
                 update: null,
-                delete: null,
+                remove: null,
                 browse: null
             }
         }));
