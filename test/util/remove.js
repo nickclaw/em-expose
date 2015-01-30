@@ -23,4 +23,11 @@ describe('util#remove', function() {
         expect(obj).to.deep.equal({a: {}});
     });
 
+    it('should handle removing keys of arrays children', function() {
+        var obj = [{a: {a: true, b: true}}, {a: {a: true, b: true}}];
+        remove(obj, 'a.a');
+
+        expect(obj).to.deep.equal([{a: {b: true}}, {a: {b: true}}]);
+    });
+
 });
