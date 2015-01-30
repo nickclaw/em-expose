@@ -28,7 +28,8 @@ describe('route#retrieve', function() {
             }
         }));
 
-        return request('http://localhost:' + C.port + '/' + model._id).should.be.fulfilled
+        return request('http://localhost:' + C.port + '/' + model._id)
+            .should.be.fulfilled
             .then(JSON.parse)
             .then(function(data) {
                 expect(data).to.have.keys('string', 'number', 'docArray', 'object', '_id', '__v');
