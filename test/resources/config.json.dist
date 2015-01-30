@@ -1,0 +1,7 @@
+{
+    "connection": "mongodb://localhost:27017/db",
+    "username": "",
+    "password": "",
+
+    "port": 8000
+}
