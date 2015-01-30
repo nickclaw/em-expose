@@ -1,6 +1,6 @@
 var Model = require('../resources/model');
 
-describe('the delete route', function() {
+describe('route#delete', function() {
 
     var model;
 
@@ -9,8 +9,8 @@ describe('the delete route', function() {
             string: "hi",
             number: 100,
             docArray: [
-            {a: "hi", b: 1},
-            {c: "by", b: 2}
+                {a: "hi", b: 1},
+                {c: "by", b: 2}
             ],
             object: {a: "hi", b: 1},
         });
@@ -23,14 +23,14 @@ describe('the delete route', function() {
             methods: {
                 create: null,
                 update: null,
-                retrieve: null,
                 browse: null
             }
         }));
 
 
         var url = 'http://localhost:' + C.port + '/' + model._id;
-        return request.del(url).then(JSON.parse)
+        return request.del(url).should.be.fulfilled
+        .then(JSON.parse)
         .then(function(data) {
             expect(data).to.have.keys('string', 'number', 'docArray', 'object', '_id', '__v');
             expect(data.docArray[0]).to.have.keys('a', 'b', '_id');
@@ -56,13 +56,12 @@ describe('the delete route', function() {
             methods: {
                 create: null,
                 update: null,
-                delete: null,
                 browse: null
             }
         }));
 
         var url = 'http://localhost:' + C.port + '/' + model._id;
-        return request.del(url)
+        return request.del(url).should.be.fulfilled
         .then(JSON.parse)
         .then(function(data) {
             expect(data).to.have.keys('docArray', 'object', '_id', '__v');

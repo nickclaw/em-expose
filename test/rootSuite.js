@@ -1,5 +1,6 @@
 var mongoose = require('mongoose'),
-express = require('express');
+    express = require('express'),
+    bodyParser = require('body-parser');
 
 global.app;
 var server;
@@ -13,6 +14,7 @@ before(function(done) {
 
 beforeEach(function(done) {
     global.app = express();
+    app.use(bodyParser());
     server = app.listen(C.port, done);
 });
 

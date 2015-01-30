@@ -1,9 +1,9 @@
 var chai = require('chai'),
-    asPromised = require('chai-as-promised'),
     req = require('request-promise');
 
 chai.should();
-chai.use(asPromised);
+chai.use(require('chai-as-promised'));
+chai.use(require('chai-shallow-deep-equal'));
 
 global.expect = chai.expect;
 global.em = require('..');

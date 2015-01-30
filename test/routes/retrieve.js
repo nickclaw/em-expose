@@ -1,6 +1,6 @@
 var Model = require('../resources/model');
 
-describe('the retrieve route', function() {
+describe('route#retrieve', function() {
 
     var model;
 
@@ -28,7 +28,7 @@ describe('the retrieve route', function() {
             }
         }));
 
-        return request('http://localhost:' + C.port + '/' + model._id)
+        return request('http://localhost:' + C.port + '/' + model._id).should.be.fulfilled
             .then(JSON.parse)
             .then(function(data) {
                 expect(data).to.have.keys('string', 'number', 'docArray', 'object', '_id', '__v');
@@ -54,7 +54,7 @@ describe('the retrieve route', function() {
             }
         }));
 
-        return request('http://localhost:' + C.port + '/' + model._id)
+        return request('http://localhost:' + C.port + '/' + model._id).should.be.fulfilled
             .then(JSON.parse)
             .then(function(data) {
                 expect(data).to.have.keys('docArray', 'object', '_id', '__v');
