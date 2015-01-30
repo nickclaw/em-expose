@@ -83,9 +83,6 @@ describe('route#update', function() {
             }
         }).should.be.fulfilled
         .then(function(data) {
-            console.log(JSON.stringify(model, null, 4));
-            console.log('-------- vs --------');
-            console.log(JSON.stringify(data, null, 4));
             expect(data).to.shallowDeepEqual(obj);
         });
     });
