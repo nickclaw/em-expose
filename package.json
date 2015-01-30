@@ -1,6 +1,6 @@
 {
   "name": "em-expose",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Automatically expose an Express api for Mongoose documents.",
   "main": "index.js",
   "license": "MIT",
