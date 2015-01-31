@@ -1,4 +1,4 @@
-em-expose [![Build Status](https://travis-ci.org/nickclaw/em-expose.svg?branch=master)](https://travis-ci.org/nickclaw/em-expose)
+emme [![Build Status](https://travis-ci.org/nickclaw/emme.svg?branch=master)](https://travis-ci.org/nickclaw/emme)
 -------------
 
 Quickly and easily expose your Mongoose models to the world with an
