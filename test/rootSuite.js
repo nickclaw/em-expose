@@ -1,7 +1,9 @@
 var mongoose = require('mongoose'),
     express = require('express'),
-    bodyParser = require('body-parser');
+    bodyParser = require('body-parser'),
+    Model = require('./resources/model');
 
+global.Model = Model;
 global.app;
 var server;
 

@@ -16,13 +16,6 @@ describe('util#remove', function() {
         expect(obj).to.deep.equal({a: {}});
     });
 
-    it('should remove as far down a path as possible', function() {
-        var obj = {a: {a: null}};
-        remove(obj, 'a.a.b');
-
-        expect(obj).to.deep.equal({a: {}});
-    });
-
     it('should handle removing keys of arrays children', function() {
         var obj = [{a: {a: true, b: true}}, {a: {a: true, b: true}}];
         remove(obj, 'a.a');
