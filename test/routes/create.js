@@ -18,10 +18,10 @@ describe('route#create', function() {
             number: 1000,
             docArray: [
                 {a: "hi", b: 1},
-                {b: "by", b: 2}
+                {a: "by", b: 2}
             ],
             object: {a: "hi", b: 10}
-        }
+        };
 
         return request({
             url: 'http://localhost:' + C.port,
@@ -33,7 +33,7 @@ describe('route#create', function() {
             expect(data.docArray[0]).to.have.keys('a', 'b', '_id');
             expect(data.object).to.have.keys('a', 'b');
             expect(data).to.shallowDeepEqual(obj);
-        })
+        });
     });
 
     it('should not allow protected/private paths to be defined', function() {
@@ -63,7 +63,7 @@ describe('route#create', function() {
                 number: 10000000,
                 docArray: [
                     {a: "hi", b: 1},
-                    {b: "by", b: 2}
+                    {a: "by", b: 2}
                 ],
                 object: {a: 'hi', b: 100}
             }
