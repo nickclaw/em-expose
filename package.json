@@ -1,6 +1,6 @@
 {
   "name": "emme",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Automatically expose an Express api for database models.",
   "main": "index.js",
   "license": "MIT",
