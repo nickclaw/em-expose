@@ -5,4 +5,4 @@ node_js:
 services:
   - mongodb
 before_script:
-    - cp test/resources/config.json.dist test/resources/config.json
+    - cp test/fixtures/config.json.dist test/fixtures/config.json

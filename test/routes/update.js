@@ -1,4 +1,4 @@
-var Model = require('../resources/model');
+var Model = require('../fixtures/model');
 
 describe('route#update', function() {
 
